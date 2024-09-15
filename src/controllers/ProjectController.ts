@@ -9,7 +9,7 @@ export class ProjectController {
 			await project.save();
 			res.send("Project Created");
 		} catch (error) {
-			console.log(error);
+			res.status(500).json({ error: "Server Error" });
 		}
 	};
 
@@ -18,7 +18,7 @@ export class ProjectController {
 			const projects = await Project.find({});
 			res.json(projects);
 		} catch (error) {
-			console.log(error);
+			res.status(500).json({ error: "Server Error" });
 		}
 	};
 
@@ -26,7 +26,7 @@ export class ProjectController {
 		try {
 			res.json(req.project);
 		} catch (error) {
-			console.log(error);
+			res.status(500).json({ error: "Server Error" });
 		}
 	};
 
@@ -38,7 +38,7 @@ export class ProjectController {
 			req.project.save();
 			res.json({ msg: "Project updated" });
 		} catch (error) {
-			console.log(error);
+			res.status(500).json({ error: "Server Error" });
 		}
 	};
 
@@ -47,7 +47,7 @@ export class ProjectController {
 			await req.project.deleteOne();
 			res.json({ msg: "Project deleted" });
 		} catch (error) {
-			console.log(error);
+			res.status(500).json({ error: "Server Error" });
 		}
 	};
 }
