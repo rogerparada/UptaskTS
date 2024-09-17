@@ -15,7 +15,7 @@ export class ProjectController {
 
 	static getAllProjects = async (req: Request, res: Response) => {
 		try {
-			const projects = await Project.find({});
+			const projects = await Project.find({}).populate("tasks");
 			res.json(projects);
 		} catch (error) {
 			res.status(500).json({ error: "Server Error" });

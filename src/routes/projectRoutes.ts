@@ -35,7 +35,7 @@ router.param("projectId", projectExits);
 router.param("taskId", taskExits);
 router.param("taskId", taskBelongToProject);
 router.post(
-	"/:/task",
+	"/:projectId/tasks",
 	body("name").notEmpty().withMessage("The task name is required"),
 	body("description").notEmpty().withMessage("The description is required"),
 	handleInputErrors,
@@ -51,6 +51,7 @@ router.put(
 	handleInputErrors,
 	TaskController.updateTask
 );
+router.delete("/:projectId/tasks/:taskId", param("taskId").isMongoId().withMessage("Not valid ID"), handleInputErrors, TaskController.deleteTask);
 router.post(
 	"/:projectId/tasks/:taskId/status",
 	param("taskId").isMongoId().withMessage("Not valid ID"),
