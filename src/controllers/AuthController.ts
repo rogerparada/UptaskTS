@@ -121,4 +121,66 @@ export class AuthController {
 			res.status(500).json({ error: "Server Error" });
 		}
 	}
+
+	static async forgotPassword(req: Request, res: Response) {
+		try {
+			const { email } = req.body;
+			const user = await User.findOne({ email });
+			if (!user) {
+				const error = new Error("This Email is not registered");
+				return res.status(404).json({ error: error.message });
+			}
+
+			const token = new Token();
+			token.token = generateToken();
+			token.user = user.id;
+			await token.save();
+			AuthEmail.sendPasswordResetToken({
+				email: user.email,
+				name: user.name,
+				token: token.token,
+			});
+
+			return res.send("Please, check your email");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
+
+	static async validateToken(req: Request, res: Response) {
+		try {
+			const { token } = req.body;
+			const tokenExists = await Token.findOne({ token });
+			if (!tokenExists) {
+				const error = new Error("Token is  not valid");
+				return res.status(404).json({ error: error.message });
+			}
+
+			res.send("Token valid, now you can reset your password");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
+	static async updatePasswordWithToken(req: Request, res: Response) {
+		try {
+			const { token } = req.params;
+			const { password } = req.body;
+			const tokenExists = await Token.findOne({ token });
+			if (!tokenExists) {
+				const error = new Error("Token is  not valid");
+				return res.status(404).json({ error: error.message });
+			}
+			const user = await User.findById(tokenExists.user);
+			user.password = await hashPassword(password);
+
+			await Promise.allSettled([user.save(), tokenExists.deleteOne()]);
+
+			res.send("Your password has been changed");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
 }
