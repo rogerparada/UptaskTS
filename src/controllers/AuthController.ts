@@ -90,4 +90,35 @@ export class AuthController {
 			res.status(500).json({ error: "Server Error" });
 		}
 	}
+
+	static async requestConfirmationCode(req: Request, res: Response) {
+		try {
+			const { email } = req.body;
+			const user = await User.findOne({ email });
+			if (!user) {
+				const error = new Error("This Email is not registered");
+				return res.status(404).json({ error: error.message });
+			}
+			if (user.confirmed) {
+				const error = new Error("This User is already confirmed");
+				return res.status(403).json({ error: error.message });
+			}
+
+			const token = new Token();
+			token.token = generateToken();
+			token.user = user.id;
+
+			AuthEmail.sendAuthEmail({
+				email: user.email,
+				name: user.name,
+				token: token.token,
+			});
+
+			await Promise.allSettled([await token.save()]);
+			return res.send("Please check your email to confirm your account");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
 }

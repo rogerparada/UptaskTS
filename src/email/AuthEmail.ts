@@ -18,7 +18,7 @@ export class AuthEmail {
                 <h1 style="color: rgb(30, 30, 244)">UpTask TS</h1>
                 <p>Hi ${user.name}, </p>
                 <p>Your account has been created</p>
-                <p>Please use this <a href="" style="font-weight: 700; color: rgb(30, 30, 244)" href="">link</a> to confirm your account and ingress this token</p>
+                <p>Please use this <a href="${process.env.ALLOWED_CORS}/auth/confirm-account" style="font-weight: 700; color: rgb(30, 30, 244)" href="">link</a> to confirm your account and ingress this token</p>
                 <p style="font-size: 2.5rem; font-weight: 800; color: rgb(30, 30, 244);">${user.token}</p>
                 <p style="font-weight: 300; color: #555">Token expires in 10 minutes</p>
             </div>`,
