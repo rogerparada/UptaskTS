@@ -22,5 +22,12 @@ router.post(
 	AuthController.createAccount
 );
 router.post("/confirm-account", body("token").notEmpty().withMessage("The token cannot be empty"), handleInputErrors, AuthController.confirmAccount);
+router.post(
+	"/login",
+	body("email").notEmpty().withMessage("The email cannot be empty").isEmail().withMessage("E-mail not Valid"),
+	body("password").notEmpty().withMessage("The password cannot be empty"),
+	handleInputErrors,
+	AuthController.login
+);
 
 export default router;
