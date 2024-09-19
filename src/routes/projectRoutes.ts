@@ -5,10 +5,13 @@ import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
 import { projectExits } from "../middleware/project";
 import { taskBelongToProject, taskExits } from "../middleware/task";
+import { authenticate } from "../middleware/auth";
 
 const router = Router();
+router.use(authenticate);
 
 router.param("id", projectExits);
+
 router.post(
 	"/",
 	body("projectName").notEmpty().withMessage("The project name is required"),

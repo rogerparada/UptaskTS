@@ -18,6 +18,12 @@ export async function projectExits(req: Request, res: Response, next: NextFuncti
 			const error = new Error("Project not Found");
 			return res.status(404).json({ error: error.message });
 		}
+
+		if (project.manager.toString() !== req.user.id) {
+			const error = new Error("Not Valid Action");
+			return res.status(404).json({ error: error.message });
+		}
+
 		req.project = project;
 		next();
 	} catch (error) {

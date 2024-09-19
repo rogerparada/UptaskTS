@@ -4,7 +4,7 @@ import Project from "../models/Project";
 export class ProjectController {
 	static createProject = async (req: Request, res: Response) => {
 		const project = new Project(req.body);
-
+		project.manager = req.user.id;
 		try {
 			await project.save();
 			res.send("Project Created");
@@ -15,9 +15,12 @@ export class ProjectController {
 
 	static getAllProjects = async (req: Request, res: Response) => {
 		try {
-			const projects = await Project.find({}).populate("tasks");
+			const projects = await Project.find({
+				$or: [{ manager: { $in: req.user.id } }],
+			});
 			res.json(projects);
 		} catch (error) {
+			console.log(error);
 			res.status(500).json({ error: "Server Error" });
 		}
 	};
@@ -36,7 +39,7 @@ export class ProjectController {
 			req.project.clientName = req.body.clientName;
 			req.project.description = req.body.description;
 			req.project.save();
-			res.json({ msg: "Project updated" });
+			res.send("Project updated");
 		} catch (error) {
 			res.status(500).json({ error: "Server Error" });
 		}
@@ -45,7 +48,7 @@ export class ProjectController {
 	static deleteProject = async (req: Request, res: Response) => {
 		try {
 			await req.project.deleteOne();
-			res.json({ msg: "Project deleted" });
+			res.send("Project deleted");
 		} catch (error) {
 			res.status(500).json({ error: "Server Error" });
 		}

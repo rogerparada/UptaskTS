@@ -5,6 +5,7 @@ import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { transport } from "../config/nodemailer";
 import { AuthEmail } from "../email/AuthEmail";
+import { generateJWT } from "../utils/jwt";
 
 export class AuthController {
 	static async createAccount(req: Request, res: Response) {
@@ -84,7 +85,8 @@ export class AuthController {
 				const error = new Error("The password is not correct");
 				return res.status(401).json({ error: error.message });
 			}
-			res.send("User Login successful");
+			//res.send("User Login successful");
+			return res.status(200).json(generateJWT({ id: user.id }));
 		} catch (error) {
 			console.log(error);
 			res.status(500).json({ error: "Server Error" });
@@ -182,5 +184,9 @@ export class AuthController {
 			console.log(error);
 			res.status(500).json({ error: "Server Error" });
 		}
+	}
+
+	static async user(req: Request, res: Response) {
+		res.json(req.user);
 	}
 }
