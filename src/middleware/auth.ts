@@ -22,7 +22,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 	try {
 		const decode = jwt.verify(token, process.env.JWT_KEY);
 		if (typeof decode === "object" && decode.id) {
-			const user = await User.findById(decode.id);
+			const user = await User.findById(decode.id).select("id name email");
 			if (user) {
 				req.user = user;
 			} else {
