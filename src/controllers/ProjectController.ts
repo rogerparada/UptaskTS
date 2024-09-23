@@ -28,9 +28,7 @@ export class ProjectController {
 	static getProjectByID = async (req: Request, res: Response) => {
 		try {
 			const { projectId } = req.params;
-			const project = await Project.findById(projectId)
-				.populate({ path: "tasks", populate: { path: "completedBy.user", select: "id name email" } })
-				.populate({ path: "tasks", populate: { path: "notes", populate: { path: "createdBy", select: "id name email" } } });
+			const project = await Project.findById(projectId).populate({ path: "tasks" });
 			if (!project) {
 				const error = new Error("Project not Found");
 				return res.status(404).json({ error: error.message });
