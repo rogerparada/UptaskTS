@@ -19,7 +19,7 @@ export async function projectExits(req: Request, res: Response, next: NextFuncti
 			return res.status(404).json({ error: error.message });
 		}
 
-		if (project.manager.toString() !== req.user.id) {
+		if (project.manager.toString() !== req.user.id && !project.team.includes(req.user.id)) {
 			const error = new Error("Not Valid Action");
 			return res.status(404).json({ error: error.message });
 		}

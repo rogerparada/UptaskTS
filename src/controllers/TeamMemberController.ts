@@ -47,13 +47,13 @@ export class TeamMemberController {
 	};
 	static removeMemberById = async (req: Request, res: Response) => {
 		try {
-			const { id } = req.body;
-			if (!req.project.team.some((team) => team.toString() === id)) {
+			const { userId } = req.params;
+			if (!req.project.team.some((team) => team.toString() === userId)) {
 				const error = new Error("The User is not a collaborator");
 				return res.status(409).json({ error: error.message });
 			}
 
-			req.project.team = req.project.team.filter((team) => team.toString() !== id);
+			req.project.team = req.project.team.filter((team) => team.toString() !== userId);
 			await req.project.save();
 			res.send("The user has been removed as a collaborator");
 		} catch (error) {

@@ -4,7 +4,7 @@ import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
 import { TaskController } from "../controllers/TaskController";
 import { projectExits } from "../middleware/project";
-import { taskBelongToProject, taskExits } from "../middleware/task";
+import { hasTaskAuthorization, taskBelongToProject, taskExits } from "../middleware/task";
 import { authenticate } from "../middleware/auth";
 import { TeamMemberController } from "../controllers/TeamMemberController";
 
@@ -49,13 +49,21 @@ router.get("/:projectId/tasks", TaskController.getProjectsTask);
 router.get("/:projectId/tasks/:taskId", param("taskId").isMongoId().withMessage("Not valid ID"), handleInputErrors, TaskController.getTaskById);
 router.put(
 	"/:projectId/tasks/:taskId",
+	hasTaskAuthorization,
 	param("taskId").isMongoId().withMessage("Not valid ID"),
 	body("name").notEmpty().withMessage("The task name is required"),
 	body("description").notEmpty().withMessage("The description is required"),
 	handleInputErrors,
 	TaskController.updateTask
 );
-router.delete("/:projectId/tasks/:taskId", param("taskId").isMongoId().withMessage("Not valid ID"), handleInputErrors, TaskController.deleteTask);
+
+router.delete(
+	"/:projectId/tasks/:taskId",
+	hasTaskAuthorization,
+	param("taskId").isMongoId().withMessage("Not valid ID"),
+	handleInputErrors,
+	TaskController.deleteTask
+);
 router.post(
 	"/:projectId/tasks/:taskId/status",
 	param("taskId").isMongoId().withMessage("Not valid ID"),
@@ -72,6 +80,11 @@ router.post(
 );
 router.post("/:projectId/team", body("id").isMongoId().withMessage("Not valid id"), handleInputErrors, TeamMemberController.addMemberById);
 router.get("/:projectId/team", handleInputErrors, TeamMemberController.getProjectTeam);
-router.delete("/:projectId/team", body("id").isMongoId().withMessage("Not valid id"), handleInputErrors, TeamMemberController.removeMemberById);
+router.delete(
+	"/:projectId/team/:userId",
+	param("userId").isMongoId().withMessage("Not valid id"),
+	handleInputErrors,
+	TeamMemberController.removeMemberById
+);
 
 export default router;

@@ -17,7 +17,7 @@ export class TaskController {
 
 	static getProjectsTask = async (req: Request, res: Response) => {
 		try {
-			const tasks = await Task.find({ project: req.project.id }).populate("project");
+			const tasks = await Task.find({ project: req.project.id });
 			res.json({ data: tasks });
 		} catch (error) {
 			res.status(500).json({ error: "Server Error" });
@@ -26,8 +26,10 @@ export class TaskController {
 
 	static getTaskById = async (req: Request, res: Response) => {
 		try {
-			res.json(req.task);
+			const task = await Task.findById(req.task.id).populate({ path: "completedBy.user", select: "id name email" });
+			res.json(task);
 		} catch (error) {
+			console.log(error);
 			res.status(500).json({ error: "Server Error" });
 		}
 	};
@@ -57,6 +59,11 @@ export class TaskController {
 		try {
 			const { status } = req.body;
 			req.task.status = status;
+			const completedBy = {
+				user: req.user.id,
+				status,
+			};
+			req.task.completedBy.push(completedBy);
 			await req.task.save();
 			res.json("Task updated");
 		} catch (error) {
