@@ -6,6 +6,6 @@ type UserPayload = {
 };
 
 export const generateJWT = (payload: UserPayload) => {
-	const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "60m" });
+	const token = jwt.sign(payload, process.env.JWT_KEY, { expiresIn: "60d" });
 	return token;
 };
