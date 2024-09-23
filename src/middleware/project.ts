@@ -13,7 +13,7 @@ export async function projectExits(req: Request, res: Response, next: NextFuncti
 	try {
 		const { projectId, id } = req.params;
 		const pId = projectId ?? id;
-		const project = await Project.findById(pId).populate("tasks");
+		const project = await Project.findById(pId);
 		if (!project) {
 			const error = new Error("Project not Found");
 			return res.status(404).json({ error: error.message });

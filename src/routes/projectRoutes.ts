@@ -23,7 +23,7 @@ router.post(
 	ProjectController.createProject
 );
 router.get("/", ProjectController.getAllProjects);
-router.get("/:id", param("id").isMongoId().withMessage("Not valid ID"), handleInputErrors, ProjectController.getProjectByID);
+router.get("/:projectId", param("projectId").isMongoId().withMessage("Not valid ID"), handleInputErrors, ProjectController.getProjectByID);
 router.put(
 	"/:id",
 	param("id").isMongoId().withMessage("Not valid ID"),
