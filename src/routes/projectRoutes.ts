@@ -7,6 +7,7 @@ import { projectExits } from "../middleware/project";
 import { hasTaskAuthorization, taskBelongToProject, taskExits } from "../middleware/task";
 import { authenticate } from "../middleware/auth";
 import { TeamMemberController } from "../controllers/TeamMemberController";
+import { NoteController } from "../controllers/NoteController";
 
 const router = Router();
 router.use(authenticate);
@@ -71,7 +72,7 @@ router.post(
 	handleInputErrors,
 	TaskController.updateTaskStatus
 );
-
+// Team Routes
 router.post(
 	"/:projectId/team/find",
 	body("email").isEmail().toLowerCase().withMessage("Not valid email"),
@@ -85,6 +86,21 @@ router.delete(
 	param("userId").isMongoId().withMessage("Not valid id"),
 	handleInputErrors,
 	TeamMemberController.removeMemberById
+);
+
+// Note Routes
+router.post(
+	"/:projectId/tasks/:taskId/notes",
+	body("content").notEmpty().withMessage("Comment is required"),
+	handleInputErrors,
+	NoteController.createNote
+);
+router.get("/:projectId/tasks/:taskId/notes", handleInputErrors, NoteController.getTaskNotes);
+router.delete(
+	"/:projectId/tasks/:taskId/notes/:noteId",
+	param("noteId").isMongoId().withMessage("Not valid Id"),
+	handleInputErrors,
+	NoteController.deleteNote
 );
 
 export default router;
