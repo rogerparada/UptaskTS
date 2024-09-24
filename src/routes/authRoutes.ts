@@ -13,7 +13,7 @@ router.post(
 		.isLength({ min: 8 })
 		.withMessage("The password must have at least 8 characters.")
 		.custom((value, { req }) => {
-			if (value !== req.body.password_confirmation) {
+			if (value !== req.body.password) {
 				throw new Error("Passwords mismatch");
 			}
 			return true;
@@ -63,5 +63,41 @@ router.post(
 );
 
 router.get("/user", authenticate, AuthController.user);
+
+/** Profile Routes */
+router.put(
+	"/profile",
+	authenticate,
+	body("name").notEmpty().withMessage("The name cannot be empty"),
+	body("email").isEmail().withMessage("E-mail not Valid"),
+	handleInputErrors,
+	AuthController.updateProfile
+);
+
+router.post(
+	"/update-password",
+	authenticate,
+	body("current_password").notEmpty().withMessage("Your current password is required."),
+	body("password").isLength({ min: 8 }).withMessage("The password must have at least 8 characters."),
+	body("password_confirmation")
+		.isLength({ min: 8 })
+		.withMessage("The password must have at least 8 characters.")
+		.custom((value, { req }) => {
+			if (value !== req.body.password) {
+				throw new Error("Passwords mismatch");
+			}
+			return true;
+		}),
+	handleInputErrors,
+	AuthController.updateCurrentUserPassword
+);
+
+router.post(
+	"/check-password",
+	authenticate,
+	body("password").notEmpty().withMessage("Your current password is required."),
+	handleInputErrors,
+	AuthController.checkPassword
+);
 
 export default router;

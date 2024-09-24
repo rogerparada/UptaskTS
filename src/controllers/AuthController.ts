@@ -189,4 +189,59 @@ export class AuthController {
 	static async user(req: Request, res: Response) {
 		res.json(req.user);
 	}
+
+	static async updateProfile(req: Request, res: Response) {
+		try {
+			const { name, email } = req.body;
+			req.user.name = name;
+			req.user.email = email;
+			const userExists = await User.findOne({ email });
+			if (userExists && userExists.id.toString() !== req.user.id.toString()) {
+				const error = new Error("This email is already registered");
+				return res.status(409).json({ error: error.message });
+			}
+
+			await req.user.save();
+			res.send("Profile Updated");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
+
+	static async updateCurrentUserPassword(req: Request, res: Response) {
+		try {
+			const { current_password, password } = req.body;
+			const user = await User.findById(req.user.id);
+			const isPasswordCorrect = await checkPassword(current_password, user.password);
+
+			if (!isPasswordCorrect) {
+				const error = new Error("The current password is not correct");
+				return res.status(401).json({ error: error.message });
+			}
+			user.password = await hashPassword(password);
+			await user.save();
+			res.send("Your password has been changed");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
+
+	static async checkPassword(req: Request, res: Response) {
+		try {
+			const { password } = req.body;
+			const user = await User.findById(req.user.id);
+			const isPasswordCorrect = await checkPassword(password, user.password);
+
+			if (!isPasswordCorrect) {
+				const error = new Error("Wrong password");
+				return res.status(401).json({ error: error.message });
+			}
+			res.send("The password is correct");
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({ error: "Server Error" });
+		}
+	}
 }
